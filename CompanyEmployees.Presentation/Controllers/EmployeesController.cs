@@ -21,9 +21,9 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEmployees(Guid companyId)
+        public async Task<IActionResult> GetEmployees(Guid companyId)
         {
-            var employees = _service.EmployeeService.GetEmployees(companyId, trackChanges: false);
+            var employees = await _service.EmployeeService.GetEmployees(companyId, trackChanges: false);
             return Ok(employees);
 
             // no try - catch as its handled globally
@@ -31,14 +31,14 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpGet]
         [Route("{employeeId:guid}", Name = "GetEmployee")]
-        public IActionResult GetEmployee(Guid companyId, Guid employeeId)
+        public async Task<IActionResult> GetEmployee(Guid companyId, Guid employeeId)
         {
-            var employee = _service.EmployeeService.GetEmployee(companyId, employeeId, trackChanges: false);
+            var employee = await _service.EmployeeService.GetEmployee(companyId, employeeId, trackChanges: false);
             return Ok(employee);
         }
 
         [HttpPost]
-        public IActionResult CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee)
+        public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee)
         {
             if (employee is null)
                 return BadRequest("EmployeeForCreationDto object is null");
@@ -46,7 +46,7 @@ namespace CompanyEmployees.Presentation.Controllers
             if (!ModelState.IsValid) 
                 return UnprocessableEntity(ModelState);
 
-            var employeeToReturn = _service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
+            var employeeToReturn = await _service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
 
             return CreatedAtRoute("GetEmployee", new
             {
@@ -56,14 +56,14 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpDelete("{employeeId:guid}")]
-        public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
+        public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
         {
-            _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+            await _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
             return NoContent();
         }
 
         [HttpPut("{employeeId:guid}")]
-        public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody] EmployeeForUpdationDto employee)
+        public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody] EmployeeForUpdationDto employee)
         {
             if (employee is null) 
                 return BadRequest("EmployeeForUpdateDto object is null");
@@ -71,7 +71,7 @@ namespace CompanyEmployees.Presentation.Controllers
             if (!ModelState.IsValid) 
                 return UnprocessableEntity(ModelState);
 
-            _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
+            await _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
             return NoContent();
         }
     }

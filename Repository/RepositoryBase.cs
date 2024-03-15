@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace Repository
 {
     // Generic repository
+    // All methods are kept as synchronous
+    // That’s because we want to leave a possibility for the repository user classes to have either sync or async method execution.
     public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
         protected RepositoryContext _context;

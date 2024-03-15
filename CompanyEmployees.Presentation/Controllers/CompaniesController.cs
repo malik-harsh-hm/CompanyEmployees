@@ -20,25 +20,25 @@ namespace CompanyEmployees.Presentation.Controllers
             _service = service;
         }
         [HttpGet]
-        public IActionResult GetCompanies()
+        public async Task<IActionResult> GetCompanies()
         {
-            var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
+            var companies = await _service.CompanyService.GetAllCompanies(trackChanges: false);
             return Ok(companies);
 
             // no try - catch as its handled globally
         }
         [HttpGet]
         [Route("{companyId:guid}", Name = "GetCompany")]
-        public IActionResult GetCompany(Guid companyId)
+        public async Task<IActionResult> GetCompany(Guid companyId)
         {
-            var company = _service.CompanyService.GetCompany(companyId, trackChanges: false);
+            var company = await _service.CompanyService.GetCompany(companyId, trackChanges: false);
             return Ok(company);
 
             // no try - catch as its handled globally
         }
 
         [HttpPost]
-        public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
             if (company is null)
                 return BadRequest("CompanyForCreationDto object is null");
@@ -46,7 +46,7 @@ namespace CompanyEmployees.Presentation.Controllers
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            var createdCompany = _service.CompanyService.CreateCompany(company);
+            var createdCompany = await _service.CompanyService.CreateCompany(company);
 
             return CreatedAtRoute("GetCompany", new
             {
@@ -55,24 +55,23 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpDelete("{companyId:guid}")]
-        public IActionResult DeleteCompany(Guid companyId)
+        public async Task<IActionResult> DeleteCompany(Guid companyId)
         {
-            _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+            await _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
             return NoContent();
         }
 
         [HttpPut("{companyId:guid}")]
-        public IActionResult UpdateCompany(Guid companyId, [FromBody] CompanyForUpdationDto company)
+        public async Task<IActionResult> UpdateCompany(Guid companyId, [FromBody] CompanyForUpdationDto company)
         {
-            if (company is null) 
+            if (company is null)
                 return BadRequest("CompanyForUpdateDto object is null");
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
+            await _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
             return NoContent();
         }
     }
 }
-  
