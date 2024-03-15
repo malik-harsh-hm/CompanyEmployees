@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.DataAnnotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace Shared.DataTransferObjects
     {
         [Required(ErrorMessage = "Employee name is a required field.")]
         [MaxLength(30, ErrorMessage = "Maximum length for the Name is 30 characters.")]
+        [FullNameValidation(ErrorMessage = "Invalid full name format")] // custom validation attribute
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Age is a required field.")]
