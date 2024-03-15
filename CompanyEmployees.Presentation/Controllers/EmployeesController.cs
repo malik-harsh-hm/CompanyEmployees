@@ -43,6 +43,9 @@ namespace CompanyEmployees.Presentation.Controllers
             if (employee is null)
                 return BadRequest("EmployeeForCreationDto object is null");
 
+            if (!ModelState.IsValid) 
+                return UnprocessableEntity(ModelState);
+
             var employeeToReturn = _service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
 
             return CreatedAtRoute("GetEmployee", new
@@ -64,6 +67,9 @@ namespace CompanyEmployees.Presentation.Controllers
         {
             if (employee is null) 
                 return BadRequest("EmployeeForUpdateDto object is null");
+
+            if (!ModelState.IsValid) 
+                return UnprocessableEntity(ModelState);
 
             _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
             return NoContent();
