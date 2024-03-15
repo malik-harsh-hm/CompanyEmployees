@@ -1,4 +1,6 @@
+using CompanyEmployees.Extensions;
 using CompanyEmployees.Extentions;
+using Contracts;
 using NLog;
 
 namespace CompanyEmployees
@@ -28,8 +30,10 @@ namespace CompanyEmployees
             // Automapper
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-            WebApplication? app = builder.Build();
-
+            WebApplication? app = builder.Build(); // Build method builds the WebApplication and registers all the services added with IOC.
+            // Global error handling
+            var logger = app.Services.GetRequiredService<ILoggerManager>(); // So, we have to extract the ILoggerManager service as its injected after build
+            app.ConfigureExceptionHandler(logger);
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
