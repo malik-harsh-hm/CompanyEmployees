@@ -1,6 +1,7 @@
 using CompanyEmployees.Extensions;
 using CompanyEmployees.Extentions;
 using Contracts;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 
 namespace CompanyEmployees
@@ -21,6 +22,10 @@ namespace CompanyEmployees
             builder.Services.ConfigureSqlContext(builder.Configuration);
             builder.Services.ConfigureRepositoryManager();
             builder.Services.ConfigureServiceManager();
+
+            // To enable our custom error responses from the actions
+            builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
+
             // Controllers
             builder.Services.AddControllers()
                 .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly); // registers only the controllers in Presentation Layer

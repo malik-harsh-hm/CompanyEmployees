@@ -29,5 +29,11 @@ namespace Repository
                 .SingleOrDefault();
             return employee;
         }
+
+        public void CreateEmployeeForCompany(Guid companyId, Employee employee)
+        {
+            employee.CompanyId = companyId; 
+            Create(employee);
+        }
     }
 }

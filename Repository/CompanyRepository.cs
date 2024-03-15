@@ -15,6 +15,11 @@ namespace Repository
         {
         }
 
+        public void CreateCompany(Company company)
+        {
+           Create(company);
+        }
+
         public IEnumerable<Company> GetAllCompanies(bool trackChanges)
         {
             var companies = FindAll(trackChanges)

@@ -1,6 +1,7 @@
 ﻿using Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DataTransferObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,13 +28,27 @@ namespace CompanyEmployees.Presentation.Controllers
             // no try - catch as its handled globally
         }
         [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetCompany(Guid id)
+        [Route("{companyId:guid}", Name = "GetCompany")]
+        public IActionResult GetCompany(Guid companyId)
         {
-            var company = _service.CompanyService.GetCompany(id, trackChanges: false);
+            var company = _service.CompanyService.GetCompany(companyId, trackChanges: false);
             return Ok(company);
 
             // no try - catch as its handled globally
+        }
+
+        [HttpPost]
+        public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
+        {
+            if (company is null) 
+                return BadRequest("CompanyForCreationDto object is null");
+
+            var createdCompany = _service.CompanyService.CreateCompany(company);
+
+            return CreatedAtRoute("GetCompany", new
+            {
+                companyId = createdCompany.Id
+            }, createdCompany);
         }
     }
 }

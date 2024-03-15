@@ -20,6 +20,18 @@ namespace Service
             _mapper = mapper;
         }
 
+        public CompanyDto CreateCompany(CompanyForCreationDto company)
+        {
+            var companyEntity = _mapper.Map<Company>(company);
+
+            _repository.Company.CreateCompany(companyEntity);
+            _repository.Save();
+
+            var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
+
+            return companyToReturn;
+        }
+
         public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
         {
             var companies = _repository.Company.GetAllCompanies(trackChanges);
