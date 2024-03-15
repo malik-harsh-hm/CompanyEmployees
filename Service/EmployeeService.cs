@@ -22,39 +22,39 @@ namespace Service
 
         public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges); 
-            if (company is null) 
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges); 
+            if (companyEntity is null) 
                 throw new CompanyNotFoundException(companyId);
 
-            var employees = _repository.Employee.GetEmployees(companyId, trackChanges);
+            var employeeEntities = _repository.Employee.GetEmployees(companyId, trackChanges);
 
-            var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+            var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities);
 
             return employeesDto;
         }
 
         public EmployeeDto GetEmployee(Guid companyId, Guid employeeId, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges);
-            if (company is null)
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
                 throw new CompanyNotFoundException(companyId);
 
-            var employee = _repository.Employee.GetEmployee(companyId, employeeId, trackChanges);
-            if (employee is null)
+            var employeeEntity = _repository.Employee.GetEmployee(companyId, employeeId, trackChanges);
+            if (employeeEntity is null)
                 throw new EmployeeNotFoundException(companyId);
 
-            var employeeDto = _mapper.Map<EmployeeDto>(employee);
+            var employeeDto = _mapper.Map<EmployeeDto>(employeeEntity);
 
             return employeeDto;
         }
 
-        public EmployeeDto CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employee, bool trackChanges)
+        public EmployeeDto CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges); 
-            if (company is null) 
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges); 
+            if (companyEntity is null) 
                 throw new CompanyNotFoundException(companyId); 
             
-            var employeeEntity = _mapper.Map<Employee>(employee); 
+            var employeeEntity = _mapper.Map<Employee>(employeeForCreation); 
 
             _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity); 
             _repository.Save();
@@ -66,15 +66,32 @@ namespace Service
 
         public void DeleteEmployeeForCompany(Guid companyId, Guid employeeId, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges);
-            if (company is null)
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
                 throw new CompanyNotFoundException(companyId);
 
-            var employee = _repository.Employee.GetEmployee(companyId, employeeId, trackChanges);
-            if (employee is null)
+            var employeeEntity = _repository.Employee.GetEmployee(companyId, employeeId, trackChanges);
+            if (employeeEntity is null)
                 throw new EmployeeNotFoundException(companyId);
 
-            _repository.Employee.DeleteEmployee(employee); 
+            _repository.Employee.DeleteEmployee(employeeEntity); 
+            _repository.Save();
+        }
+
+        public void UpdateEmployeeForCompany(Guid companyId, Guid employeeId, EmployeeForUpdationDto employeeForUpdation, bool compTrackChanges, bool empTrackChanges)
+        {
+            var companyEntity = _repository.Company.GetCompany(companyId, compTrackChanges);
+            if (companyEntity is null)
+                throw new CompanyNotFoundException(companyId);
+
+            var employeeEntity = _repository.Employee.GetEmployee(companyId, employeeId, empTrackChanges);
+            if (employeeEntity is null)
+                throw new EmployeeNotFoundException(companyId);
+
+            // Connected Update:
+            // We are mapping from the employeeForUpdate object (we will change just the age property in a request)
+            // to the employeeEntity — thus changing the state of the employeeEntity object to Modified.
+            _mapper.Map(employeeForUpdation, employeeEntity); 
             _repository.Save();
         }
     }

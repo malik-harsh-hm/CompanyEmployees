@@ -35,8 +35,6 @@ namespace CompanyEmployees.Presentation.Controllers
         {
             var employee = _service.EmployeeService.GetEmployee(companyId, employeeId, trackChanges: false);
             return Ok(employee);
-
-            // no try - catch as its handled globally
         }
 
         [HttpPost]
@@ -58,6 +56,16 @@ namespace CompanyEmployees.Presentation.Controllers
         public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
         {
             _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+            return NoContent();
+        }
+
+        [HttpPut("{employeeId:guid}")]
+        public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody] EmployeeForUpdationDto employee)
+        {
+            if (employee is null) 
+                return BadRequest("EmployeeForUpdateDto object is null");
+
+            _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
             return NoContent();
         }
     }

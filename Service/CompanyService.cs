@@ -4,6 +4,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using System.ComponentModel.Design;
 
 namespace Service
 {
@@ -34,11 +35,11 @@ namespace Service
 
         public void DeleteCompany(Guid companyId, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges);
-            if (company is null)
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
                 throw new CompanyNotFoundException(companyId);
 
-            _repository.Company.DeleteCompany(company); 
+            _repository.Company.DeleteCompany(companyEntity); 
             _repository.Save();
         }
 
@@ -52,12 +53,26 @@ namespace Service
         }
         public CompanyDto GetCompany(Guid companyId, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(companyId, trackChanges);
-            if (company is null)
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
                 throw new CompanyNotFoundException(companyId);
 
-            var companyDto = _mapper.Map<CompanyDto>(company);
+            var companyDto = _mapper.Map<CompanyDto>(companyEntity);
             return companyDto;
+        }
+
+        public void UpdateCompany(Guid companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges)
+        {
+            var companyEntity = _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
+                throw new CompanyNotFoundException(companyId);
+
+            // Connected Update:
+            // We are mapping from the companyForUpdate object
+            // to the companyEntity — thus changing the state of the companyEntity object to Modified.
+            _mapper.Map(companyForUpdate, companyEntity); 
+            _repository.Save();
+
         }
     }
 }
