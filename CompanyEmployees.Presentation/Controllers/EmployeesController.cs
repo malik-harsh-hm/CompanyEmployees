@@ -19,6 +19,7 @@ namespace CompanyEmployees.Presentation.Controllers
         {
             _service = service;
         }
+
         [HttpGet]
         public IActionResult GetEmployees(Guid companyId)
         {
@@ -27,6 +28,7 @@ namespace CompanyEmployees.Presentation.Controllers
 
             // no try - catch as its handled globally
         }
+
         [HttpGet]
         [Route("{employeeId:guid}", Name = "GetEmployee")]
         public IActionResult GetEmployee(Guid companyId, Guid employeeId)
@@ -50,6 +52,13 @@ namespace CompanyEmployees.Presentation.Controllers
                 companyId,
                 employeeId = employeeToReturn.Id
             }, employeeToReturn);
+        }
+
+        [HttpDelete("{employeeId:guid}")]
+        public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
+        {
+            _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+            return NoContent();
         }
     }
 }

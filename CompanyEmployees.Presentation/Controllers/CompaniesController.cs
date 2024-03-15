@@ -40,7 +40,7 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpPost]
         public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
         {
-            if (company is null) 
+            if (company is null)
                 return BadRequest("CompanyForCreationDto object is null");
 
             var createdCompany = _service.CompanyService.CreateCompany(company);
@@ -49,6 +49,13 @@ namespace CompanyEmployees.Presentation.Controllers
             {
                 companyId = createdCompany.Id
             }, createdCompany);
+        }
+
+        [HttpDelete("{companyId:guid}")]
+        public IActionResult DeleteCompany(Guid companyId)
+        {
+            _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+            return NoContent();
         }
     }
 }

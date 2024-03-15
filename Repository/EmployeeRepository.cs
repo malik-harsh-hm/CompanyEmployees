@@ -27,6 +27,7 @@ namespace Repository
         {
             var employee = FindByCondition(e => e.CompanyId == companyId && e.Id == employeeId, trackChanges)
                 .SingleOrDefault();
+
             return employee;
         }
 
@@ -34,6 +35,11 @@ namespace Repository
         {
             employee.CompanyId = companyId; 
             Create(employee);
+        }
+
+        public void DeleteEmployee(Employee employee)
+        {
+            Delete(employee);
         }
     }
 }
