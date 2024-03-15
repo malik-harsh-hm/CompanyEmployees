@@ -10,28 +10,28 @@ using System.Threading.Tasks;
 namespace CompanyEmployees.Presentation.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class CompaniesController : ControllerBase
+    [Route("api/companies/{companyId}/[controller]")]
+    public class EmployeesController : ControllerBase
     {
         private readonly IServiceManager _service;
-        public CompaniesController(IServiceManager service)
+        public EmployeesController(IServiceManager service)
         {
             _service = service;
         }
         [HttpGet]
-        public IActionResult GetCompanies()
+        public IActionResult GetEmployees(Guid companyId)
         {
-            var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
-            return Ok(companies);
+            var employees = _service.EmployeeService.GetEmployees(companyId, trackChanges: false);
+            return Ok(employees);
 
             // no try - catch as its handled globally
         }
         [HttpGet]
         [Route("{id:guid}")]
-        public IActionResult GetCompany(Guid id)
+        public IActionResult GetEmployee(Guid companyId, Guid id)
         {
-            var company = _service.CompanyService.GetCompany(id, trackChanges: false);
-            return Ok(company);
+            var employee = _service.EmployeeService.GetEmployee(companyId, id, trackChanges: false);
+            return Ok(employee);
 
             // no try - catch as its handled globally
         }

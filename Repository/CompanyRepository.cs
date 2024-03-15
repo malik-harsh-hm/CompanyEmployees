@@ -24,5 +24,11 @@ namespace Repository
             return companies;
         }
 
+        public Company GetCompany(Guid companyId, bool trackChanges)
+        {
+            var company = FindByCondition(c => c.Id == companyId, trackChanges)
+                .SingleOrDefault();
+            return company;
+        }
     }
 }
