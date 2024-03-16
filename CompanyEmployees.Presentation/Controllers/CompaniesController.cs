@@ -1,4 +1,5 @@
-﻿using Entities.Exceptions;
+﻿using CompanyEmployees.Filters.ActionFilters;
+using Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -38,6 +39,7 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpPost]
+        [ValidationActionFilter]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
             if (company is null)
@@ -62,6 +64,7 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpPut("{companyId:guid}")]
+        [ValidationActionFilter]
         public async Task<IActionResult> UpdateCompany(Guid companyId, [FromBody] CompanyForUpdationDto company)
         {
             if (company is null)
