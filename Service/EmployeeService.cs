@@ -4,6 +4,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace Service
 {
@@ -20,13 +21,13 @@ namespace Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<EmployeeDto>> GetEmployees(Guid companyId, bool trackChanges)
+        public async Task<IEnumerable<EmployeeDto>> GetEmployees(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
         {
-            var companyEntity = await _repository.Company.GetCompany(companyId, trackChanges); 
-            if (companyEntity is null) 
+            var companyEntity = await _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
                 throw new CompanyNotFoundException(companyId);
 
-            var employeeEntities = await _repository.Employee.GetEmployees(companyId, trackChanges);
+            var employeeEntities = await _repository.Employee.GetEmployees(companyId, employeeParameters, trackChanges);
 
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities);
 
@@ -50,13 +51,13 @@ namespace Service
 
         public async Task<EmployeeDto> CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
         {
-            var companyEntity = await _repository.Company.GetCompany(companyId, trackChanges); 
-            if (companyEntity is null) 
-                throw new CompanyNotFoundException(companyId); 
-            
-            var employeeEntity = _mapper.Map<Employee>(employeeForCreation); 
+            var companyEntity = await _repository.Company.GetCompany(companyId, trackChanges);
+            if (companyEntity is null)
+                throw new CompanyNotFoundException(companyId);
 
-            _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity); 
+            var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
+
+            _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
             await _repository.SaveAsync();
 
             var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
@@ -74,7 +75,7 @@ namespace Service
             if (employeeEntity is null)
                 throw new EmployeeNotFoundException(companyId);
 
-            _repository.Employee.DeleteEmployee(employeeEntity); 
+            _repository.Employee.DeleteEmployee(employeeEntity);
             await _repository.SaveAsync();
         }
 
@@ -91,7 +92,7 @@ namespace Service
             // Connected Update:
             // We are mapping from the employeeForUpdate object (we will change just the age property in a request)
             // to the employeeEntity — thus changing the state of the employeeEntity object to Modified.
-            _mapper.Map(employeeForUpdation, employeeEntity); 
+            _mapper.Map(employeeForUpdation, employeeEntity);
             await _repository.SaveAsync();
         }
     }

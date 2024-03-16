@@ -1,6 +1,8 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,13 @@ namespace Repository
         public EmployeeRepository(RepositoryContext context) : base(context)
         {
         }
-        public async Task<IEnumerable<Employee>> GetEmployees(Guid companyId, bool trackChanges)
+        public async Task<IEnumerable<Employee>> GetEmployees(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
         {
             var employees = await FindByCondition(e => e.CompanyId == companyId, trackChanges)
                 .OrderBy(c => c.Name)
+                .FilterEmployees(employeeParameters?.MinAge, employeeParameters?.MaxAge)
+                .SearchEmployees(employeeParameters?.SearchTerm)
+                .PageEmployees(employeeParameters?.PageNumber, employeeParameters?.PageSize)
                 .ToListAsync();
 
             return employees;
@@ -35,7 +40,7 @@ namespace Repository
         // Kept synchronous as we are not makinh any changes to DB
         public void CreateEmployeeForCompany(Guid companyId, Employee employee)
         {
-            employee.CompanyId = companyId; 
+            employee.CompanyId = companyId;
             Create(employee);
         }
 
