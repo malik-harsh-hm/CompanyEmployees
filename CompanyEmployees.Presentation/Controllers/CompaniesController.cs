@@ -30,6 +30,7 @@ namespace CompanyEmployees.Presentation.Controllers
         }
         [HttpGet]
         [Route("{companyId:guid}", Name = "GetCompany")]
+        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetCompany(Guid companyId)
         {
             var company = await _service.CompanyService.GetCompany(companyId, trackChanges: false);

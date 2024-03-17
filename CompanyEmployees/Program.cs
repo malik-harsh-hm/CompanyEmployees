@@ -17,11 +17,13 @@ namespace CompanyEmployees
 
             // Custom extension methods for IServiceCollection
             builder.Services.ConfigureCors();
+            builder.Services.ConfigureResponseCaching();
             builder.Services.ConfigureIISIntegration();
             builder.Services.ConfigureLoggerService();
             builder.Services.ConfigureSqlContext(builder.Configuration);
             builder.Services.ConfigureRepositoryManager();
             builder.Services.ConfigureServiceManager();
+
 
             // To enable our custom error responses from the actions
             builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
@@ -48,6 +50,7 @@ namespace CompanyEmployees
 
             app.UseHttpsRedirection();
             app.UseCors("MyCorsPolicy");
+            app.UseResponseCaching();
             app.UseAuthorization();
             app.MapControllers(); // adds the endpoints from controller actions to the IEndpointRouteBuilder
             app.Run(); // that runs the application
