@@ -29,6 +29,9 @@ namespace CompanyEmployees
             // Controllers
             builder.Services.AddControllers()
                 .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly); // registers only the controllers in Presentation Layer
+
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.AssemblyReference).Assembly));
+
             // Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

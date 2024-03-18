@@ -1,5 +1,8 @@
-﻿using CompanyEmployees.Filters.ActionFilters;
+﻿using Application.Commands.Employee;
+using Application.Queries.Employee;
+using CompanyEmployees.Filters.ActionFilters;
 using Entities.Exceptions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -16,26 +19,25 @@ namespace CompanyEmployees.Presentation.Controllers
     [Route("api/companies/{companyId}/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly IServiceManager _service;
-        public EmployeesController(IServiceManager service)
+        private readonly IMediator _mediator;
+        public EmployeesController(IMediator mediator)
         {
-            _service = service;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetEmployees(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
-            var employees = await _service.EmployeeService.GetEmployees(companyId, employeeParameters, trackChanges: false);
+            var employees = await _mediator.Send(new GetEmployeesQuery(companyId, employeeParameters, trackChanges: false));
             return Ok(employees);
 
-            // no try - catch as its handled globally
         }
 
         [HttpGet]
         [Route("{employeeId:guid}", Name = "GetEmployee")]
         public async Task<IActionResult> GetEmployee(Guid companyId, Guid employeeId)
         {
-            var employee = await _service.EmployeeService.GetEmployee(companyId, employeeId, trackChanges: false);
+            var employee = await _mediator.Send(new GetEmployeeQuery(companyId, employeeId, trackChanges: false));
             return Ok(employee);
         }
 
@@ -46,10 +48,10 @@ namespace CompanyEmployees.Presentation.Controllers
             if (employee is null)
                 return BadRequest("EmployeeForCreationDto object is null");
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            var employeeToReturn = await _service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
+            var employeeToReturn = await _mediator.Send(new CreateEmployeeForCompanyCommand(companyId, employee, trackChanges: false));
 
             return CreatedAtRoute("GetEmployee", new
             {
@@ -61,7 +63,7 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpDelete("{employeeId:guid}")]
         public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
         {
-            await _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+            await _mediator.Send(new DeleteEmployeeForCompanyCommand(companyId, employeeId, trackChanges: false));
             return NoContent();
         }
 
@@ -69,13 +71,13 @@ namespace CompanyEmployees.Presentation.Controllers
         [ValidationActionFilter]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody] EmployeeForUpdationDto employee)
         {
-            if (employee is null) 
+            if (employee is null)
                 return BadRequest("EmployeeForUpdateDto object is null");
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            await _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
+            await _mediator.Send(new UpdateEmployeeForCompanyCommand(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true)); // Track Employee changes - as soon as we change any property in this entity, EF Core will set the state of that entity to Modified.
             return NoContent();
         }
     }

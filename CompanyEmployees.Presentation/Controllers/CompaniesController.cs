@@ -1,5 +1,8 @@
-﻿using CompanyEmployees.Filters.ActionFilters;
+﻿using Application.Commands.Company;
+using Application.Queries.Company;
+using CompanyEmployees.Filters.ActionFilters;
 using Entities.Exceptions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -16,29 +19,25 @@ namespace CompanyEmployees.Presentation.Controllers
     [Route("api/[controller]")]
     public class CompaniesController : ControllerBase
     {
-        private readonly IServiceManager _service;
-        public CompaniesController(IServiceManager service)
+        private readonly IMediator _mediator;
+        public CompaniesController(IMediator mediator)
         {
-            _service = service;
+            _mediator = mediator;
         }
         [HttpGet]
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> GetCompanies()
         {
-            var companies = await _service.CompanyService.GetAllCompanies(trackChanges: false);
+            var companies = await _mediator.Send(new GetCompaniesQuery(trackChanges: false));
             return Ok(companies);
-
-            // no try - catch as its handled globally
         }
         [HttpGet]
         [Route("{companyId:guid}", Name = "GetCompany")]
         [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetCompany(Guid companyId)
         {
-            var company = await _service.CompanyService.GetCompany(companyId, trackChanges: false);
+            var company = await _mediator.Send(new GetCompanyQuery(id: companyId, trackChanges: false));
             return Ok(company);
-
-            // no try - catch as its handled globally
         }
 
         [HttpPost]
@@ -51,7 +50,7 @@ namespace CompanyEmployees.Presentation.Controllers
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            var createdCompany = await _service.CompanyService.CreateCompany(company);
+            var createdCompany = await _mediator.Send(new CreateCompanyCommand(company));
 
             return CreatedAtRoute("GetCompany", new
             {
@@ -62,7 +61,7 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpDelete("{companyId:guid}")]
         public async Task<IActionResult> DeleteCompany(Guid companyId)
         {
-            await _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+            await _mediator.Send(new DeleteCompanyCommand(companyId, trackChanges: false));
             return NoContent();
         }
 
@@ -76,7 +75,7 @@ namespace CompanyEmployees.Presentation.Controllers
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            await _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
+            await _mediator.Send(new UpdateCompanyCommand(companyId, company, trackChanges: true));
             return NoContent();
         }
     }
