@@ -1,5 +1,6 @@
 ﻿using CompanyEmployees.Filters.ActionFilters;
 using Entities.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -21,6 +22,7 @@ namespace CompanyEmployees.Presentation.Controllers
             _service = service;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _service.CompanyService.GetAllCompanies(trackChanges: false);

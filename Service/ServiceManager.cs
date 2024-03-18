@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
 using Contracts;
+using Entities.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Service.Contracts;
 using System;
 using System.Collections.Generic;
@@ -13,12 +16,15 @@ namespace Service
     {
         private readonly ICompanyService _companyService;
         private readonly IEmployeeService _employeeService;
-        public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper)
+        private readonly IAuthenticationService _authenticationService;
+        public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
         {
             _companyService = new CompanyService(repositoryManager, logger, mapper);
             _employeeService = new EmployeeService(repositoryManager, logger, mapper);
+            _authenticationService = new AuthenticationService(logger, mapper, userManager, configuration);
         }
         public ICompanyService CompanyService { get { return _companyService; } }
         public IEmployeeService EmployeeService { get { return _employeeService; } }
+        public IAuthenticationService AuthenticationService { get { return _authenticationService; } }
     }
 }
